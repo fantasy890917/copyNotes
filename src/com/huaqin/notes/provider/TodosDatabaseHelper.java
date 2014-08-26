@@ -39,7 +39,7 @@ public class TodosDatabaseHelper extends SQLiteOpenHelper{
 		return mSingleton ;
 	}
 	
-	public TodosDatabaseHelper(Context context) {
+	private TodosDatabaseHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 			// TODO Auto-generated constructor stub
 		}
