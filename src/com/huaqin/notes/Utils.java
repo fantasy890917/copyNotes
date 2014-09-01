@@ -7,6 +7,8 @@ import android.database.Cursor;
 public class Utils {
 	private static final String TAG = "TAG";
 	
+	public static final int OPERATOR_NONE = 0;
+
 	/**
 	 * return column value by name.
 	 * @param name

@@ -18,6 +18,8 @@ import android.widget.TextView;
 public class TodosActivity extends Activity {
 	private static final String TAG = "TodosActivity";
 	
+	private static final int REQUEST_ADD_NEW = 1;
+	
 	 /** display number of All Todos */
 	private TextView mNumberTextView;
 	
@@ -104,7 +106,16 @@ public class TodosActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
-		return super.onOptionsItemSelected(item);
+		 super.onOptionsItemSelected(item);
+		 switch(item.getItemId()){
+		 case R.id.btn_new_todo:
+			 Intent intent = new Intent(TodosActivity.this,EditTodoActivity.class);
+			 startActivityForResult(intent, REQUEST_ADD_NEW);
+			 break;
+		 default:
+			 break;
+		 }
+		 return true;
 	}
 
 	@Override
@@ -125,6 +136,10 @@ public class TodosActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	public void updateHeaderNumberText(String text){
+		mNumberTextView.setText(text);
 	}
 	
 	class AdapterViewListener implements AdapterView.OnItemClickListener,
