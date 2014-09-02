@@ -144,6 +144,7 @@ public class TodosListAdapter extends BaseAdapter implements QueryListener,
 
 	@Override
 	public TodoInfo getItem(int position) {
+		LogUtils.d(TAG, "getItem()= " + position);
 		if(mTodosExpand){
 			int index = position - 1;
 			if(index < 0){
@@ -175,6 +176,7 @@ public class TodosListAdapter extends BaseAdapter implements QueryListener,
 
 	@Override
 	public long getItemId(int position) {
+		LogUtils.d(TAG, "getItemId()= " + position);
 		return position;
 	}
 
@@ -182,15 +184,20 @@ public class TodosListAdapter extends BaseAdapter implements QueryListener,
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LogUtils.d(TAG, "getView");
 		int viewType = getItemViewType(position); 
+		LogUtils.d(TAG, "getItemViewType()="+viewType);
 		switch(viewType){
 			case TYPE_TODOS_HEADER:
 				updateTodosHeaderView();
+				return mTodosHeaderView;
 			case TYPE_TODOS_FOOTER :
 				updateTodosFooterView();
+				return mTodosFooterView;
 			case TYPE_DONES_HEADER:
 				updateDonesHeaderView();
+				return mDonesHeaderView;
 			case TYPE_DONES_FOOTER:
 				updateDonesFooterView();
+				return mDonesFooterView;
 			case TYPE_TODOS_ITEM :
 			case TYPE_DONES_ITEM :
 			default :
@@ -360,7 +367,7 @@ public class TodosListAdapter extends BaseAdapter implements QueryListener,
 	private void updateTodosFooterView(){
 		String todosInfo = mContext.getResources().getString(R.string.todos_empty_info);
 		FooterHolder todoFooterHolder = null;
-		if(todoFooterHolder == null){
+		if(mTodosFooterView == null){
 			todoFooterHolder = new FooterHolder();
 			mTodosFooterView = mInflater.inflate(R.layout.list_footer, null);
 			todoFooterHolder.mFooterHelper = (TextView) mTodosFooterView
@@ -406,9 +413,9 @@ public class TodosListAdapter extends BaseAdapter implements QueryListener,
 	}
 	
 	private void updateDonesFooterView(){
-		String donesInfo = mContext.getResources().getString(R.string.todos_empty_info);
+		String donesInfo = mContext.getResources().getString(R.string.dones_empty_info);
 		FooterHolder donesFooterHolder = null;
-		if(donesFooterHolder == null){
+		if(mDonesFooterView == null){
 			donesFooterHolder = new FooterHolder();
 			mDonesFooterView = mInflater.inflate(R.layout.list_footer, null);
 			donesFooterHolder.mFooterHelper = (TextView) mDonesFooterView
@@ -422,7 +429,56 @@ public class TodosListAdapter extends BaseAdapter implements QueryListener,
 	}
 	
 	private View getItemView(int position, View convertView, ViewGroup parent){
-		return null;
+		ViewHolder holder = null;
+		if(convertView == null || !(convertView.getTag() instanceof ViewHolder)) {
+			convertView = mInflater.inflate(R.layout.list_item, null);
+			holder = new ViewHolder();
+			holder.mTofoInfoText = (TextView) convertView.findViewById(R.id.item_text);
+			holder.mTofoInfoState = (ImageView) convertView.findViewById(R.id.item_state);
+			holder.mTodoInfoDueDate = (TextView) convertView.findViewById(R.id.item_due_date);
+			holder.mChangeInfoState = (ImageView) convertView.findViewById(R.id.change_info_state);
+			holder.mTodoInfoCheckBox = (CheckBox) convertView.findViewById(R.id.item_checkbox);
+			convertView.setTag(holder);
+		} else {
+			holder = (ViewHolder) convertView.getTag();
+		}
+		
+		TodoInfo info  = null;
+		String dateText = null;
+		int statusDrawableId = R.drawable.todos_ic_expired;
+		boolean checkBoxEnable = false;
+		boolean checked = false;
+		int changeStatusDrawableId = R.drawable.todos_ic_todo;
+		if(mTodosExpand){
+			int index = getIndexByPosition(TodoInfo.STATUS_TODO, position);
+			if(index >= 0 && index < mTodosDataSource.size()){
+				info  =  mTodosDataSource.get(index);
+				dateText = Utils.getDateText(mContext, info.getDueDate(), Utils.DATE_TYPE_DUE);
+			}
+		}
+		
+		if(info == null && mDonesExpand){
+			
+		}
+		return convertView;
+	}
+	
+	private int getIndexByPosition(String status, int position){
+		int index = 0;
+		if(TodoInfo.STATUS_TODO.equals(status)){
+			index = position - 1;
+		} else {
+			if(mTodosDataSource.isEmpty()){
+				index = position - 3;
+			} else {
+				if(mTodosExpand){
+					index = position - 2 - mTodosDataSource.size();
+				} else {
+					index = position - 2;
+				}
+			}
+		}
+		return index;
 	}
 	
 	public boolean isEditing(){
